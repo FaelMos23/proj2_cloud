@@ -21,6 +21,7 @@ function status_label(string $status): string
 {
     $labels = [
         'rascunho' => 'Rascunho',
+        'pendente' => 'Aguardando execução',
     ];
     return '<span class="badge b-' . h($status) . '">' . h($labels[$status] ?? $status) . '</span>';
 }
@@ -41,6 +42,7 @@ function page_header(string $title): void
   <nav>
     <a href="index.php">Ambientes</a>
     <a href="new.php">Novo ambiente</a>
+    <a href="scripts.php">Scripts</a>
   </nav>
 </header>
 <main>

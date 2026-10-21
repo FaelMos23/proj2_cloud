@@ -1,9 +1,19 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 #
+# Projeto 2 — Computação em Nuvem (PUC Campinas)
+# Ambiente web para execução de programas isolados com cgroups/namespaces.
+#
+# Toda a carga do ambiente parte deste Vagrantfile: a VM é criada, e no
+# provisionamento o código da aplicação é clonado do GitHub e instalado.
+#
 # Uso:
 #   vagrant up                      # cria e provisiona a VM
 #   http://localhost:8080           # interface web (ou http://192.168.56.10)
+#
+# Variáveis opcionais (no host, antes do `vagrant up` / `vagrant provision`):
+#   PROJ2_REPO   — URL do repositório (padrão: repositório do grupo)
+#   PROJ2_BRANCH — branch a ser clonada (padrão: main)
 
 REPO_URL    = ENV.fetch("PROJ2_REPO",   "https://github.com/Lu-CLopes/proj2_cloud.git")
 REPO_BRANCH = ENV.fetch("PROJ2_BRANCH", "main")
@@ -17,7 +27,7 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.56.10"
 
-  # O código vem do git clone no provision.
+  # O código NÃO é compartilhado do host: ele vem do git clone no provision.
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # Requisito mínimo: 1 core e 4096 MB de memória
@@ -28,6 +38,7 @@ Vagrant.configure("2") do |config|
   end
 
   # Provisionamento: instala git, clona (ou atualiza) o repositório e executa
+  # o script de instalação que está dentro do próprio repositório.
   config.vm.provision "shell",
     name: "git-clone-e-bootstrap",
     env: { "REPO_URL" => REPO_URL, "REPO_BRANCH" => REPO_BRANCH, "APP_DIR" => APP_DIR },

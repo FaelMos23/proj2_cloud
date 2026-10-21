@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $form['io_read_mbps'], $form['io_write_mbps'],
         ]);
         $id = (int)db()->lastInsertId();
-        flash("Ambiente #$id solicitado. Recursos registrados.");
-        redirect('index.php');
+        flash("Ambiente #$id solicitado. Agora defina o que será executado.");
+        redirect('configure.php?id=' . $id);
     }
 }
 
