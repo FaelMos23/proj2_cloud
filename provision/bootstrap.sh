@@ -91,4 +91,4 @@ a2ensite -q proj2
 systemctl enable apache2
 systemctl restart apache2
 
-log "Pronto! Acesse http://localhost:8080 (host) ou http://192.168.56.10"
+log "Pronto! Acesse http://localhost:8080 no host (ou a porta definida em PROJ2_PORT)"
