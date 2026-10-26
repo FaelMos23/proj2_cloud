@@ -1,12 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 #
-# Projeto 2 — Computação em Nuvem (PUC Campinas)
-# Ambiente web para execução de programas isolados com cgroups/namespaces.
-#
-# Toda a carga do ambiente parte deste Vagrantfile: a VM é criada, e no
-# provisionamento o código da aplicação é clonado do GitHub e instalado.
-#
 # Uso (macOS, Windows ou Linux):
 #   vagrant up                      # cria e provisiona a VM
 #   http://localhost:8080           # interface web
@@ -52,7 +46,6 @@ Vagrant.configure("2") do |config|
   config.vm.network "private_network", ip: PRIVATE_IP unless PRIVATE_IP.empty?
 
   # O código NÃO é compartilhado do host: ele vem do git clone no provision.
-  # (Isso também evita problemas de permissões e de fim de linha CRLF do Windows.)
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # Requisito mínimo: 1 core e 4096 MB de memória
@@ -63,10 +56,7 @@ Vagrant.configure("2") do |config|
     vb.gui    = false
   end
 
-  # Provisionamento: instala git, clona (ou atualiza) o repositório e executa
-  # o script de instalação que está dentro do próprio repositório.
-  # binary: false (padrão) -> o Vagrant converte CRLF em LF antes de executar,
-  # então o script funciona mesmo se o Vagrantfile vier do Windows com CRLF.
+  # Provisionamento: instala git, clona o repositório e executa
   config.vm.provision "shell",
     name: "git-clone-e-bootstrap",
     binary: false,
