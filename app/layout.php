@@ -21,7 +21,10 @@ function status_label(string $status): string
 {
     $labels = [
         'rascunho' => 'Rascunho',
-        'pendente' => 'Aguardando execução',
+        'pendente'    => 'Aguardando execução',
+        'em_execucao' => 'Em execução',
+        'terminado'   => 'Terminado',
+        'erro'        => 'Erro',
     ];
     return '<span class="badge b-' . h($status) . '">' . h($labels[$status] ?? $status) . '</span>';
 }

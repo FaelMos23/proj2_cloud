@@ -5,6 +5,7 @@
 #
 #   * Apache 2 + PHP  (interface web)
 #   * MySQL           (armazenamento permanente)
+#   * Controlador     (runner/envctl.sh via sudo, usuário proj2run)
 #
 set -euo pipefail
 
@@ -40,7 +41,32 @@ log "Aplicando esquema do banco (db/schema.sql)"
 mysql "${DB_NAME}" < "${APP_DIR}/db/schema.sql"
 
 # ---------------------------------------------------------------------------
-# 3. Apache — VirtualHost apontando para web/
+# 3. Controlador de ambientes (runner/envctl.sh)
+# ---------------------------------------------------------------------------
+log "Configurando controlador de ambientes"
+
+# Usuário sem privilégios que executa os programas dos usuários
+id proj2run >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin proj2run
+
+# Diretórios de trabalho
+install -d -m 0755 -o root     -g root     /var/lib/proj2
+install -d -m 0755 -o www-data -g www-data /var/lib/proj2/jobs   # jobs gerados pela web
+install -d -m 0755 -o root     -g root     /var/lib/proj2/envs   # ambientes (output, estado)
+
+# O código é de root: o www-data não pode alterar o controlador que roda via sudo
+chown -R root:root "${APP_DIR}"
+chmod 0755 "${APP_DIR}/runner/envctl.sh"
+
+# www-data pode executar SOMENTE o envctl.sh como root, sem senha
+cat > /etc/sudoers.d/proj2 <<EOF
+# Projeto 2 — a aplicação web controla os ambientes via envctl.sh
+www-data ALL=(root) NOPASSWD: ${APP_DIR}/runner/envctl.sh
+EOF
+chmod 0440 /etc/sudoers.d/proj2
+visudo -cf /etc/sudoers.d/proj2
+
+# ---------------------------------------------------------------------------
+# 4. Apache — VirtualHost apontando para web/
 # ---------------------------------------------------------------------------
 log "Configurando Apache"
 cat > /etc/apache2/sites-available/proj2.conf <<EOF

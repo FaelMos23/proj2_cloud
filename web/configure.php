@@ -6,6 +6,7 @@
 //   * O ambiente deve ter a rede isolada?
 require __DIR__ . '/../app/bootstrap.php';
 require __DIR__ . '/../app/scripts_repo.php';
+require __DIR__ . '/../app/runner.php';
 
 $id  = (int)($_GET['id'] ?? 0);
 $env = find_env($id);
@@ -15,8 +16,9 @@ if (!$env) {
     page_footer();
     exit;
 }
-if (!in_array($env['status'], ['rascunho', 'pendente'], true)) {
-    flash('Este ambiente não pode mais ser reconfigurado.', 'err');
+$env = sync_env($env);
+if ($env['status'] === 'em_execucao') {
+    flash('Termine a execução antes de alterar a configuração.', 'err');
     redirect('env.php?id=' . $id);
 }
 
@@ -101,6 +103,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $form['run_kind'], $form['isolate_net'], $id,
         ]);
         flash("Ambiente #$id configurado.");
+
+        if (($_POST['then'] ?? 'run') === 'run') {
+            [$ok, $msg] = start_env(find_env($id));
+            flash($msg, $ok ? 'ok' : 'err');
+        }
         redirect('env.php?id=' . $id);
     }
 }
@@ -189,7 +196,8 @@ foreach ($errors as $e) {
     <label class="inline"><input type="checkbox" name="isolate_net" value="1" <?= $checked((bool)$form['isolate_net']) ?>> Isolar rede (namespace de rede próprio, apenas loopback)</label>
   </fieldset>
 
-  <button type="submit">Salvar configuração</button>
+  <button type="submit" name="then" value="run">Salvar e executar</button>
+  <button type="submit" name="then" value="save" class="secondary">Apenas salvar</button>
   <a class="btn secondary" href="index.php">Voltar</a>
 </form>
 

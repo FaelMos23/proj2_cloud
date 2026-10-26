@@ -35,8 +35,18 @@ CREATE TABLE IF NOT EXISTS environments (
     run_kind          VARCHAR(16)   NULL,                 -- tarefa (termina) | servico (contínuo)
     isolate_net       TINYINT(1)    NOT NULL DEFAULT 0,   -- namespace de rede isolado
 
-    -- rascunho = só recursos definidos | pendente = configurado, aguardando execução
+    -- Ciclo de vida
+    --   rascunho    = só recursos definidos
+    --   pendente    = configurado, aguardando execução
+    --   em_execucao = processo rodando no ambiente
+    --   terminado   = processo terminou com sucesso (ou foi parado pelo usuário)
+    --   erro        = processo terminou com código != 0 ou falhou ao iniciar
     status            VARCHAR(20)   NOT NULL DEFAULT 'rascunho',
+    status_msg        VARCHAR(255)  NULL,
+    pid               INT UNSIGNED  NULL,                 -- PID (no host) do processo principal
+    exit_code         INT           NULL,
+    started_at        DATETIME      NULL,
+    finished_at       DATETIME      NULL,
 
     created_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
