@@ -104,11 +104,15 @@ if [ "$CMD" == "start" ]; then
         [ -z "$DISK_NAME" ] && DISK_NAME=$(basename "$TARGET_MNT" | head -n1)
         MAJMIN=$(lsblk -dno MAJ:MIN "/dev/$DISK_NAME" 2>/dev/null | head -n1)
         [ -z "$MAJMIN" ] && MAJMIN="8:0"
-        echo "$MAJMIN rbps=$((IO_R * 1024 * 1024)) wbps=$((IO_W * 1024 * 1024))" > "$CG/io.max"
+
+        [ "$IO_R" -eq 0 ] && R_LIMIT="max" || R_LIMIT=$((IO_R * 1024 * 1024))
+        [ "$IO_W" -eq 0 ] && W_LIMIT="max" || W_LIMIT=$((IO_W * 1024 * 1024))
+
+        echo "$MAJMIN rbps=$R_LIMIT wbps=$W_LIMIT" > "$CG/io.max" 2>/dev/null
     fi
 
     # iniciar Supervisor desacoplado do PHP e sudo
-    setsid -f /opt/proj2_cloud/runner/envctl.sh _supervise "$ID" "$NET"
+    setsid -f /opt/proj2_cloud/runner/envctl.sh _supervise "$ID" "$NET" >/dev/null 2>&1
 
     # aguardar até o processo isolado escrever o main.pid (até 5s)
     for i in {1..50}; do
