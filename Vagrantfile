@@ -25,7 +25,7 @@
 # box_architecture e a escolha automática de arquitetura existem desde o Vagrant 2.4
 Vagrant.require_version ">= 2.4.0"
 
-REPO_URL    = ENV.fetch("PROJ2_REPO",   "https://github.com/Lu-CLopes/proj2_cloud.git")
+REPO_URL    = ENV.fetch("PROJ2_REPO",   "https://github.com/FaelMos23/proj2_cloud.git")
 REPO_BRANCH = ENV.fetch("PROJ2_BRANCH", "main")
 PRIVATE_IP  = ENV.fetch("PROJ2_IP",     "")
 BOX_ARCH    = ENV.fetch("PROJ2_ARCH",   "")
