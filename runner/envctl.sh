@@ -84,6 +84,7 @@ if [ "$CMD" == "start" ]; then
 
     # preparar diretórios e copiar arquivos por segurança
     mkdir -p "$ENV_DIR/work" "$ENV_DIR/job" /sys/fs/cgroup/proj2
+    chown -R proj2run:proj2run "$ENV_DIR/work"  # permite o usuário criar arquivos
     echo "+cpu +memory +io +pids" > /sys/fs/cgroup/cgroup.subtree_control 2>/dev/null
     echo "+cpu +memory +io +pids" > /sys/fs/cgroup/proj2/cgroup.subtree_control 2>/dev/null
     cp -r "/var/lib/proj2/jobs/$ID/"* "$ENV_DIR/job/" 2>/dev/null
